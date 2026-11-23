@@ -1,0 +1,35 @@
+# Render Blueprint for the FixIt Campus API (Express + Socket.IO + CLIP). See docs/DEPLOY.md.
+# Secrets are NOT stored here: every `sync: false` value is typed into the Render dashboard.
+services:
+  - type: web
+    name: fixit-campus-api
+    runtime: node
+    plan: free
+    region: singapore # closest Render region to Bengaluru
+    # Install only the server, then bake the CLIP model into the build so cold starts skip the download.
+    buildCommand: npm ci --workspace server --omit=dev && npm run prefetch-model -w server
+    startCommand: node server/server.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "24"
+      - key: NODE_ENV
+        value: production
+      - key: TRUST_PROXY # Render's load balancer is one hop in front of the app
+        value: "1"
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: UPLOAD_DIR
+        value: uploads
+      - key: AI_TRIAGE_ENABLED
+        value: "true"
+      - key: AI_TIMEOUT_MS # the free plan has a small CPU share; AI never blocks a report
+        value: "8000"
+      - key: RATE_LIMIT_AUTH_MAX # expo visitors often share one Wi-Fi IP
+        value: "100"
+      - key: MONGODB_URI # mongodb+srv://… from MongoDB Atlas
+        sync: false
+      - key: JWT_SECRET # 96 random hex characters
+        sync: false
+      - key: CLIENT_ORIGIN # the exact web URL, e.g. https://fixit-campus.vercel.app
+        sync: false
