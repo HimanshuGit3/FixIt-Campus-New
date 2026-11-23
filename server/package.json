@@ -14,6 +14,7 @@
     "seed:ai": "node scripts/seed.js --reset --with-ai",
     "calibrate:ai": "node scripts/calibrate-ai.js",
     "create-admin": "node scripts/create-admin.js",
+    "prefetch-model": "node scripts/prefetch-model.js",
     "e2e": "node scripts/e2e.js",
     "lint": "eslint . --max-warnings 0"
   },
