@@ -219,6 +219,27 @@ describe('rate limiting', () => {
       'RATE_LIMITED',
     );
   });
+
+  it('behind a trusted proxy, limits each client IP separately', async () => {
+    const proxied = createApp({ authRateLimitMax: 2, trustProxy: 1 });
+    const body = { email: 'nobody@test.edu', password: 'whatever1' };
+    const from = (ip) =>
+      request(proxied).post('/api/auth/login').set('X-Forwarded-For', ip).send(body);
+    for (let i = 0; i < 2; i += 1) expect((await from('203.0.113.1')).status).toBe(401);
+    expect((await from('203.0.113.1')).status).toBe(429);
+    // A different visitor behind the same proxy is not blocked by the first one.
+    expect((await from('203.0.113.2')).status).toBe(401);
+  });
+
+  it('without trust proxy, a forged X-Forwarded-For does not escape the limit', async () => {
+    const direct = createApp({ authRateLimitMax: 2, trustProxy: 0 });
+    const body = { email: 'nobody@test.edu', password: 'whatever1' };
+    const from = (ip) =>
+      request(direct).post('/api/auth/login').set('X-Forwarded-For', ip).send(body);
+    await from('198.51.100.1');
+    await from('198.51.100.2');
+    expect((await from('198.51.100.3')).status).toBe(429);
+  });
 });
 
 describe('CORS', () => {

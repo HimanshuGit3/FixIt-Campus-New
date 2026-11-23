@@ -33,6 +33,9 @@ const schema = z.object({
   AUTO_CLOSE_HOURS: z.coerce.number().positive().default(72),
   FIREBASE_SERVICE_ACCOUNT: z.string().optional(),
   RATE_LIMIT_AUTH_MAX: z.coerce.number().int().positive().default(20),
+  // Number of reverse proxies in front of the API (Render, Nginx…). 0 = connect directly.
+  // A hop count, never `true`: trusting every hop would let clients spoof their IP.
+  TRUST_PROXY: z.coerce.number().int().min(0).max(5).default(0),
 });
 
 function fail(problems) {

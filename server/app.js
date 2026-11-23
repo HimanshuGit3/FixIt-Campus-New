@@ -16,11 +16,15 @@ export const allowedOrigins = env.CLIENT_ORIGIN.split(',').map((o) => o.trim());
 
 /**
  * Build the Express app without listening. Tests call this directly with supertest.
- * @param {{ authRateLimitMax?: number }} [options]
+ * @param {{ authRateLimitMax?: number, trustProxy?: number }} [options]
  */
 export function createApp(options = {}) {
   const app = express();
   app.disable('x-powered-by');
+  // Behind a hosting proxy every request arrives from the proxy's address. Trusting exactly
+  // TRUST_PROXY hops makes req.ip the real client, so the per-IP login limit is per visitor.
+  const trustProxy = options.trustProxy ?? env.TRUST_PROXY;
+  if (trustProxy > 0) app.set('trust proxy', trustProxy);
   app.use(
     helmet({
       // Photos under /uploads are shown by the web app on another origin.

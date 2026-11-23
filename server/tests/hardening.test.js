@@ -114,6 +114,13 @@ describe('fail-fast configuration (NFR-04)', () => {
       expect(parseEnv({ ...minimal, JWT_EXPIRES_IN: bad }).problems[0]).toContain('JWT_EXPIRES_IN');
   });
 
+  it('takes TRUST_PROXY as a small hop count, never "true"', () => {
+    expect(parseEnv(minimal).env.TRUST_PROXY).toBe(0);
+    expect(parseEnv({ ...minimal, TRUST_PROXY: '1' }).env.TRUST_PROXY).toBe(1);
+    for (const bad of ['true', '-1', '99'])
+      expect(parseEnv({ ...minimal, TRUST_PROXY: bad }).problems[0]).toContain('TRUST_PROXY');
+  });
+
   it('refuses a test run against a non-test database', () => {
     expect(
       parseEnv({
