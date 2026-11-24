@@ -12,12 +12,23 @@
       "args": ["--dart-define=API_BASE_URL=http://10.0.2.2:5000"]
     },
     {
+      // Phone plugged in by USB: `adb reverse` tunnels the phone's port 5000 to this laptop,
+      // so no Wi-Fi, LAN IP or firewall setup is needed.
+      "name": "FixIt (phone via USB)",
+      "type": "dart",
+      "request": "launch",
+      "cwd": "mobile",
+      "program": "lib/main.dart",
+      "preLaunchTask": "adb reverse 5000",
+      "args": ["--dart-define=API_BASE_URL=http://127.0.0.1:5000"]
+    },
+    {
       "name": "FixIt (phone on same Wi-Fi)",
       "type": "dart",
       "request": "launch",
       "cwd": "mobile",
       "program": "lib/main.dart",
-      "args": ["--dart-define=API_BASE_URL=http://192.168.1.10:5000"]
+      "args": ["--dart-define=API_BASE_URL=http://172.17.110.188:5000"]
     }
   ]
 }

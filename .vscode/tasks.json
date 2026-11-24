@@ -1,0 +1,16 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      // Forwards port 5000 on every USB-connected Android device to this laptop's API server.
+      "label": "adb reverse 5000",
+      "type": "shell",
+      "command": "adb reverse tcp:5000 tcp:5000",
+      "windows": {
+        "command": "& \"$env:LOCALAPPDATA\\Android\\Sdk\\platform-tools\\adb.exe\" -d reverse tcp:5000 tcp:5000"
+      },
+      "presentation": { "reveal": "silent" },
+      "problemMatcher": []
+    }
+  ]
+}
